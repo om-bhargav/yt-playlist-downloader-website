@@ -6,47 +6,48 @@
     <title>YT Downloader Pro - Download YouTube Videos & Playlists</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            orange: '#f97316', // orange-500
+                            dark: '#ea580c',   // orange-600
+                        },
+                        dark: {
+                            bg: '#1c1c1e',
+                            darker: '#121214',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         html {
             scroll-behavior: smooth;
         }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        /* Custom Tailwind Configuration (optional, if needed for fonts, but for simplicity, default sans works well) */
-        @layer base {
-            :root {
-                --color-primary: 251 146 60; /* orange-500 */
-                --color-dark-bg: 28 28 30; /* a very dark grey */
-                --color-darker-bg: 18 18 20; /* even darker */
-            }
-        }
-        .bg-custom-dark {
-            background-color: rgb(var(--color-dark-bg));
-        }
-        .bg-custom-darker {
-            background-color: rgb(var(--color-darker-bg));
-        }
-        .text-primary-orange {
-            color: rgb(var(--color-primary));
-        }
-        .bg-primary-orange {
-            background-color: rgb(var(--color-primary));
-        }
         .shadow-orange-subtle {
-            box-shadow: 0 10px 30px rgba(251, 146, 60, 0.2);
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.25);
         }
         .glass-effect {
             background-color: rgba(40, 40, 42, 0.4);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
     </style>
 </head>
-<body class="bg-custom-dark text-gray-100 antialiased">
+<body class="bg-dark-bg text-gray-100 antialiased overflow-x-hidden">
     <div id="root"></div>
 
     <script type="module">
@@ -55,43 +56,46 @@
 
         const e = React.createElement;
         const { useState, useEffect } = React;
-
-        // Utility for smooth scrolling
-        const scrollToSection = (id) => {
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-        };
+        const DOWNLOAD_LINK = "https://github.com/om-bhargav/Youtube-video-playlist-downloader/archive/refs/tags/1.0.zip";
 
         const Navbar = () => {
             const [isOpen, setIsOpen] = useState(false);
+            const [scrolled, setScrolled] = useState(false);
 
-            return e('nav', { className: 'fixed w-full z-50 bg-custom-darker/90 backdrop-blur-md py-4 shadow-lg' },
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 20);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return e('nav', { className: `fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-dark-darker/95 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-5'}` },
                 e('div', { className: 'max-w-7xl mx-auto px-6 flex justify-between items-center' },
-                    e('a', { href: '#hero', className: 'flex items-center text-2xl font-extrabold text-primary-orange' },
+                    e('a', { href: '#hero', className: 'flex items-center text-2xl font-extrabold text-primary-orange hover:scale-105 transition-transform' },
                         e('i', { className: 'fa-solid fa-download mr-2' }),
                         'YT Downloader ',
-                        e('span', { className: 'text-gray-200' }, 'Pro')
+                        e('span', { className: 'text-gray-200 ml-1' }, 'Pro')
                     ),
                     e('div', { className: 'hidden md:flex space-x-8 items-center' },
-                        e('a', { href: '#hero', className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium' }, 'Home'),
-                        e('a', { href: '#features', className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium' }, 'Features'),
-                        e('a', { href: '#testimonials', className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium' }, 'Testimonials'),
-                        e('a', { href: '#download', className: 'px-6 py-3 bg-primary-orange text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-orange-subtle transform hover:-translate-y-1 transition-all duration-300 ease-out' },
+                        e('a', { href: '#hero', className: 'text-gray-300 hover:text-primary-orange transition-colors text-base font-medium' }, 'Home'),
+                        e('a', { href: '#features', className: 'text-gray-300 hover:text-primary-orange transition-colors text-base font-medium' }, 'Features'),
+                        e('a', { href: '#testimonials', className: 'text-gray-300 hover:text-primary-orange transition-colors text-base font-medium' }, 'Testimonials'),
+                        e('a', { href: DOWNLOAD_LINK, className: 'px-6 py-2.5 bg-gradient-to-r from-primary-orange to-primary-dark text-white rounded-full text-base font-semibold shadow-lg hover:shadow-orange-subtle transform hover:-translate-y-1 transition-all duration-300 ease-out' },
                             e('i', { className: 'fa-solid fa-arrow-down mr-2' }),
                             'Download Now'
                         )
                     ),
                     e('div', { className: 'md:hidden' },
-                        e('button', { onClick: () => setIsOpen(!isOpen), className: 'text-gray-300 text-2xl focus:outline-none' },
+                        e('button', { onClick: () => setIsOpen(!isOpen), className: 'text-gray-300 text-2xl focus:outline-none hover:text-primary-orange transition-colors' },
                             e('i', { className: isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars' })
                         )
                     )
                 ),
-                isOpen && e('div', { className: 'md:hidden bg-custom-darker py-4' },
-                    e('div', { className: 'flex flex-col items-center space-y-4 px-6' },
-                        e('a', { href: '#hero', onClick: () => setIsOpen(false), className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium w-full text-center py-2' }, 'Home'),
-                        e('a', { href: '#features', onClick: () => setIsOpen(false), className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium w-full text-center py-2' }, 'Features'),
-                        e('a', { href: '#testimonials', onClick: () => setIsOpen(false), className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium w-full text-center py-2' }, 'Testimonials'),
-                        e('a', { href: '#download', onClick: () => setIsOpen(false), className: 'w-full text-center px-6 py-3 bg-primary-orange text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-orange-subtle transform hover:-translate-y-1 transition-all duration-300 ease-out mt-4' },
+                isOpen && e('div', { className: 'md:hidden bg-dark-darker border-t border-gray-800 absolute w-full left-0 top-full shadow-2xl' },
+                    e('div', { className: 'flex flex-col items-center space-y-4 px-6 py-6' },
+                        e('a', { href: '#hero', onClick: () => setIsOpen(false), className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium w-full text-center' }, 'Home'),
+                        e('a', { href: '#features', onClick: () => setIsOpen(false), className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium w-full text-center' }, 'Features'),
+                        e('a', { href: '#testimonials', onClick: () => setIsOpen(false), className: 'text-gray-300 hover:text-primary-orange transition-colors text-lg font-medium w-full text-center' }, 'Testimonials'),
+                        e('a', { href: DOWNLOAD_LINK, onClick: () => setIsOpen(false), className: 'w-full text-center px-6 py-3 bg-gradient-to-r from-primary-orange to-primary-dark text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-orange-subtle mt-2' },
                             e('i', { className: 'fa-solid fa-arrow-down mr-2' }),
                             'Download Now'
                         )
@@ -101,79 +105,59 @@
         };
 
         const Hero = () => {
-            return e('section', { id: 'hero', className: 'relative overflow-hidden py-32 md:py-48 bg-custom-darker min-h-screen flex items-center justify-center' },
-                e('div', { className: 'absolute inset-0 opacity-10 bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)]' }),
+            return e('section', { id: 'hero', className: 'relative overflow-hidden pt-40 pb-32 md:pt-48 md:pb-40 bg-dark-darker min-h-[90vh] flex items-center justify-center' },
+                e('div', { className: 'absolute inset-0 opacity-10 bg-[radial-gradient(#f97316_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]' }),
+                e('div', { className: 'absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary-orange opacity-10 blur-[120px] rounded-full mix-blend-screen pointer-events-none animate-pulse-slow' }),
                 e('div', { className: 'relative z-10 max-w-7xl mx-auto px-6 text-center' },
                     e('h1', { className: 'text-5xl md:text-7xl font-extrabold leading-tight mb-6 tracking-tight text-gray-50' },
                         'Unleash Your Favorite ',
-                        e('span', { className: 'text-primary-orange' }, 'YouTube Content')
+                        e('span', { className: 'text-transparent bg-clip-text bg-gradient-to-r from-primary-orange to-yellow-400' }, 'YouTube Content')
                     ),
-                    e('p', { className: 'text-xl md:text-2xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed' },
-                        'Experience blazing-fast downloads for videos and entire playlists, all in stunning quality. Simple, intuitive, and powerful.'
+                    e('p', { className: 'text-lg md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed' },
+                        'Experience blazing-fast downloads for videos and entire playlists, all in stunning quality. Simple, intuitive, and highly powerful.'
                     ),
-                    e('a', { href: '#', id: 'download', className: 'inline-flex items-center px-10 py-5 bg-primary-orange text-white rounded-full text-xl font-bold shadow-2xl shadow-primary-orange/40 hover:scale-105 hover:shadow-orange-subtle transform transition-all duration-300 ease-out group' },
-                        e('i', { className: 'fa-solid fa-cloud-arrow-down mr-3 group-hover:animate-bounce-y-slight' }),
+                    e('a', { href: DOWNLOAD_LINK, className: 'inline-flex items-center px-8 py-4 md:px-10 md:py-5 bg-gradient-to-r from-primary-orange to-primary-dark text-white rounded-full text-lg md:text-xl font-bold shadow-2xl shadow-primary-orange/30 hover:scale-105 hover:shadow-orange-subtle transform transition-all duration-300 ease-out group' },
+                        e('i', { className: 'fa-solid fa-cloud-arrow-down mr-3 group-hover:-translate-y-1 transition-transform' }),
                         'Download for Windows',
-                        e('span', { className: 'ml-3 text-gray-200 text-sm opacity-80 group-hover:opacity-100 transition-opacity' }, '(v1.0.0)')
+                        e('span', { className: 'ml-3 text-white/70 text-sm font-medium group-hover:text-white transition-colors' }, '(v1.0)')
                     ),
-                    e('p', { className: 'mt-6 text-gray-400 text-sm' }, 'Requires Windows 10 or later.')
+                    e('p', { className: 'mt-6 text-gray-500 text-sm font-medium flex items-center justify-center gap-2' }, 
+                        e('i', { className: 'fa-brands fa-windows' }),
+                        'Requires Windows 10 or later.'
+                    )
                 )
             );
         };
 
         const Features = () => {
             const featuresData = [
-                {
-                    icon: 'fa-solid fa-video',
-                    title: 'High-Quality Downloads',
-                    description: 'Download videos in resolutions up to 4K and 8K, ensuring you never miss a detail. Experience crystal-clear visuals offline.'
-                },
-                {
-                    icon: 'fa-solid fa-list-check',
-                    title: 'Full Playlist Support',
-                    description: 'Effortlessly download entire YouTube playlists with just a few clicks. Organize your content seamlessly, saving time and effort.'
-                },
-                {
-                    icon: 'fa-solid fa-gauge-high',
-                    title: 'Blazing Fast Speeds',
-                    description: 'Our optimized engine ensures rapid download speeds, so you spend less time waiting and more time enjoying your content.'
-                },
-                {
-                    icon: 'fa-solid fa-user-gear',
-                    title: 'Intuitive User Interface',
-                    description: 'Designed for simplicity and efficiency, our sleek interface makes downloading content a breeze for everyone, from beginners to pros.'
-                },
-                {
-                    icon: 'fa-solid fa-shield-alt',
-                    title: 'Secure & Ad-Free',
-                    description: 'Enjoy your downloads without intrusive ads or security concerns. Our software is built with your privacy and safety in mind.'
-                },
-                {
-                    icon: 'fa-solid fa-mobile-alt',
-                    title: 'Cross-Device Playback',
-                    description: 'Download content once and enjoy it on any device. Our files are universally compatible, giving you ultimate flexibility.'
-                }
+                { icon: 'fa-solid fa-video', title: 'High-Quality Downloads', description: 'Download videos in resolutions up to 4K and 8K, ensuring you never miss a detail. Experience crystal-clear visuals offline.' },
+                { icon: 'fa-solid fa-list-check', title: 'Full Playlist Support', description: 'Effortlessly download entire YouTube playlists with just a few clicks. Organize your content seamlessly, saving time and effort.' },
+                { icon: 'fa-solid fa-gauge-high', title: 'Blazing Fast Speeds', description: 'Our optimized engine ensures rapid download speeds, so you spend less time waiting and more time enjoying your content.' },
+                { icon: 'fa-solid fa-user-gear', title: 'Intuitive Interface', description: 'Designed for simplicity and efficiency, our sleek interface makes downloading content a breeze for everyone, from beginners to pros.' },
+                { icon: 'fa-solid fa-shield-halved', title: 'Secure & Ad-Free', description: 'Enjoy your downloads without intrusive ads or security concerns. Our software is built with your privacy and safety in mind.' },
+                { icon: 'fa-solid fa-mobile-screen', title: 'Cross-Device Playback', description: 'Download content once and enjoy it on any device. Our files are universally compatible, giving you ultimate flexibility.' }
             ];
 
             const FeatureCard = (props) => {
                 const { icon, title, description } = props;
-                return e('div', { className: 'relative p-8 rounded-3xl glass-effect shadow-xl border border-gray-800 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary-orange/20 transition-all duration-300 ease-out flex flex-col items-start text-left h-full' },
-                    e('div', { className: 'absolute top-0 left-0 w-24 h-24 rounded-full bg-primary-orange opacity-10 blur-xl -translate-x-10 -translate-y-10' }),
-                    e('i', { className: `${icon} text-5xl text-primary-orange mb-6` }),
-                    e('h3', { className: 'text-2xl font-bold text-gray-50 mb-3' }, title),
-                    e('p', { className: 'text-gray-300 text-lg leading-relaxed' }, description)
+                return e('div', { className: 'relative p-8 rounded-2xl glass-effect group hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-orange/10 transition-all duration-300 ease-out flex flex-col items-start text-left h-full overflow-hidden' },
+                    e('div', { className: 'absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-orange/20 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110' }),
+                    e('div', { className: 'w-14 h-14 rounded-xl bg-dark-darker border border-gray-700 flex items-center justify-center mb-6 group-hover:border-primary-orange/50 transition-colors shadow-lg' },
+                        e('i', { className: `${icon} text-2xl text-primary-orange` })
+                    ),
+                    e('h3', { className: 'text-xl font-bold text-gray-50 mb-3 group-hover:text-primary-orange transition-colors' }, title),
+                    e('p', { className: 'text-gray-400 text-base leading-relaxed' }, description)
                 );
             };
 
-            return e('section', { id: 'features', className: 'relative py-24 md:py-32 bg-custom-dark overflow-hidden' },
-                e('div', { className: 'absolute top-1/4 left-0 w-96 h-96 bg-primary-orange opacity-5 blur-[100px] rounded-full' }),
-                e('div', { className: 'absolute bottom-1/4 right-0 w-96 h-96 bg-gray-50 opacity-5 blur-[100px] rounded-full' }),
+            return e('section', { id: 'features', className: 'relative py-24 md:py-32 bg-dark-bg' },
                 e('div', { className: 'relative z-10 max-w-7xl mx-auto px-6' },
-                    e('div', { className: 'text-center mb-16' },
-                        e('h2', { className: 'text-4xl md:text-6xl font-extrabold text-gray-50 mb-5' }, 'Why YT Downloader Pro?'),
-                        e('p', { className: 'text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed' }, 'Discover the powerful features that make downloading YouTube content a seamless experience.')
+                    e('div', { className: 'text-center mb-20' },
+                        e('h2', { className: 'text-3xl md:text-5xl font-extrabold text-gray-50 mb-6' }, 'Why YT Downloader Pro?'),
+                        e('p', { className: 'text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed' }, 'Discover the powerful features that make downloading YouTube content a seamless experience.')
                     ),
-                    e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10' },
+                    e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' },
                         featuresData.map((feature, index) => e(FeatureCard, { key: index, ...feature }))
                     )
                 )
@@ -182,44 +166,36 @@
 
         const Testimonials = () => {
             const testimonialsData = [
-                {
-                    quote: "YT Downloader Pro is a game-changer! I can download entire playlists for my offline study sessions in minutes. The quality is superb and the interface is incredibly easy to use.",
-                    author: "Sarah J.",
-                    role: "Student & Content Creator"
-                },
-                {
-                    quote: "Finally, a downloader that just works! No ads, no fuss, just pure speed and high-quality video. This is an essential tool for anyone who needs reliable YouTube downloads.",
-                    author: "Mark T.",
-                    role: "Software Engineer"
-                },
-                {
-                    quote: "I've tried many YouTube downloaders, but none come close to the efficiency and simplicity of YT Downloader Pro. The playlist feature alone saved me hours!",
-                    author: "Emily R.",
-                    role: "Digital Marketer"
-                }
+                { quote: "YT Downloader Pro is a game-changer! I can download entire playlists for my offline study sessions in minutes. The quality is superb.", author: "Sarah J.", role: "Student" },
+                { quote: "Finally, a downloader that just works! No ads, no fuss, just pure speed and high-quality video. This is an essential tool.", author: "Mark T.", role: "Software Engineer" },
+                { quote: "I've tried many YouTube downloaders, but none come close to the efficiency and simplicity of this one. Saved me hours!", author: "Emily R.", role: "Digital Marketer" }
             ];
 
             const TestimonialCard = (props) => {
                 const { quote, author, role } = props;
-                return e('div', { className: 'p-8 rounded-3xl glass-effect shadow-xl border border-gray-800 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary-orange/20 transition-all duration-300 ease-out flex flex-col justify-between h-full' },
-                    e('div', { className: 'text-primary-orange mb-4 text-3xl' },
-                        e('i', { className: 'fa-solid fa-quote-left' })
+                return e('div', { className: 'p-8 rounded-2xl glass-effect flex flex-col justify-between h-full border border-gray-800/50 hover:border-gray-700 transition-colors' },
+                    e('div', null,
+                        e('i', { className: 'fa-solid fa-quote-left text-primary-orange/50 text-4xl mb-4' }),
+                        e('p', { className: 'text-gray-300 text-lg mb-8 leading-relaxed relative z-10' }, quote)
                     ),
-                    e('p', { className: 'text-gray-200 text-xl italic mb-6 leading-relaxed' }, quote),
-                    e('div', {},
-                        e('h4', { className: 'text-lg font-bold text-gray-50' }, author),
-                        e('p', { className: 'text-gray-400 text-md' }, role)
+                    e('div', { className: 'flex items-center gap-4' },
+                        e('div', { className: 'w-12 h-12 rounded-full bg-dark-darker flex items-center justify-center border border-gray-700 text-primary-orange font-bold text-xl' }, author.charAt(0)),
+                        e('div', null,
+                            e('h4', { className: 'text-base font-bold text-gray-50' }, author),
+                            e('p', { className: 'text-primary-orange text-sm font-medium' }, role)
+                        )
                     )
                 );
             };
 
-            return e('section', { id: 'testimonials', className: 'py-24 md:py-32 bg-custom-darker overflow-hidden' },
-                e('div', { className: 'max-w-7xl mx-auto px-6' },
-                    e('div', { className: 'text-center mb-16' },
-                        e('h2', { className: 'text-4xl md:text-6xl font-extrabold text-gray-50 mb-5' }, 'What Our Users Say'),
-                        e('p', { className: 'text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed' }, 'Hear from satisfied users who have transformed their YouTube experience with YT Downloader Pro.')
+            return e('section', { id: 'testimonials', className: 'py-24 md:py-32 bg-dark-darker relative' },
+                e('div', { className: 'absolute left-0 bottom-0 w-1/2 h-1/2 bg-primary-orange/5 blur-[150px] rounded-tr-full pointer-events-none' }),
+                e('div', { className: 'max-w-7xl mx-auto px-6 relative z-10' },
+                    e('div', { className: 'text-center mb-20' },
+                        e('h2', { className: 'text-3xl md:text-5xl font-extrabold text-gray-50 mb-6' }, 'What Our Users Say'),
+                        e('p', { className: 'text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed' }, 'Join thousands of satisfied users who have transformed their YouTube experience.')
                     ),
-                    e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10' },
+                    e('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-8' },
                         testimonialsData.map((testimonial, index) => e(TestimonialCard, { key: index, ...testimonial }))
                     )
                 )
@@ -227,50 +203,56 @@
         };
 
         const CTA = () => {
-            return e('section', { className: 'py-24 md:py-32 bg-primary-orange relative overflow-hidden' },
-                e('div', { className: 'max-w-7xl mx-auto px-6 text-center relative z-10' },
-                    e('h2', { className: 'text-4xl md:text-6xl font-extrabold text-white mb-6' }, 'Ready to Get Started?'),
-                    e('p', { className: 'text-xl md:text-2xl text-white opacity-90 mb-10 max-w-3xl mx-auto leading-relaxed' },
-                        'Download YT Downloader Pro now and unlock the full potential of your favorite YouTube content. Fast, reliable, and free.'
+            return e('section', { className: 'py-20 md:py-28 bg-gradient-to-br from-primary-orange to-primary-dark relative overflow-hidden' },
+                e('div', { className: 'absolute inset-0 opacity-20 bg-[url("https://www.transparenttextures.com/patterns/cubes.png")]' }),
+                e('div', { className: 'max-w-4xl mx-auto px-6 text-center relative z-10' },
+                    e('h2', { className: 'text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight' }, 'Ready to Get Started?'),
+                    e('p', { className: 'text-lg md:text-xl text-white/90 mb-10 leading-relaxed' },
+                        'Download YT Downloader Pro now and unlock the full potential of your favorite content. Fast, reliable, and completely free.'
                     ),
-                    e('a', { href: '#', className: 'inline-flex items-center px-10 py-5 bg-gray-900 text-white rounded-full text-xl font-bold shadow-2xl shadow-gray-950/40 hover:scale-105 transform transition-all duration-300 ease-out group' },
-                        e('i', { className: 'fa-solid fa-cloud-arrow-down mr-3 group-hover:animate-bounce-y-slight' }),
-                        'Download for Windows'
+                    e('a', { href: DOWNLOAD_LINK, className: 'inline-flex items-center px-10 py-5 bg-dark-bg text-white rounded-full text-lg font-bold shadow-2xl hover:scale-105 hover:bg-dark-darker transform transition-all duration-300 ease-out group' },
+                        e('i', { className: 'fa-solid fa-download mr-3 group-hover:text-primary-orange transition-colors' }),
+                        'Download the .ZIP File'
                     )
                 )
             );
         };
 
         const Footer = () => {
-            return e('footer', { className: 'bg-custom-darker py-16 text-gray-400' },
-                e('div', { className: 'max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12' },
-                    e('div', {},
+            return e('footer', { className: 'bg-dark-darker pt-20 pb-10 border-t border-gray-800' },
+                e('div', { className: 'max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12 mb-16' },
+                    e('div', { className: 'md:col-span-5' },
                         e('a', { href: '#hero', className: 'flex items-center text-2xl font-extrabold text-primary-orange mb-4' },
                             e('i', { className: 'fa-solid fa-download mr-2' }),
                             'YT Downloader ',
-                            e('span', { className: 'text-gray-200' }, 'Pro')
+                            e('span', { className: 'text-gray-200 ml-1' }, 'Pro')
                         ),
-                        e('p', { className: 'text-gray-300 text-lg mb-4 leading-relaxed' }, 'Your ultimate solution for fast and high-quality YouTube video and playlist downloads.'),
-                        e('p', { className: 'text-gray-500 text-sm' }, '© 2023 YT Downloader Pro. All rights reserved.')
-                    ),
-                    e('div', {},
-                        e('h3', { className: 'text-xl font-bold text-gray-50 mb-6' }, 'Quick Links'),
-                        e('ul', { className: 'space-y-3' },
-                            e('li', {}, e('a', { href: '#hero', className: 'hover:text-primary-orange transition-colors text-lg' }, 'Home')),
-                            e('li', {}, e('a', { href: '#features', className: 'hover:text-primary-orange transition-colors text-lg' }, 'Features')),
-                            e('li', {}, e('a', { href: '#testimonials', className: 'hover:text-primary-orange transition-colors text-lg' }, 'Testimonials')),
-                            e('li', {}, e('a', { href: '#download', className: 'hover:text-primary-orange transition-colors text-lg' }, 'Download'))
+                        e('p', { className: 'text-gray-400 text-base mb-6 leading-relaxed max-w-sm' }, 'Your ultimate solution for fast and high-quality YouTube video and playlist downloads.'),
+                        e('div', { className: 'flex space-x-4' },
+                            e('a', { href: '#', className: 'w-10 h-10 rounded-full bg-dark-bg border border-gray-800 flex items-center justify-center text-gray-400 hover:text-primary-orange hover:border-primary-orange transition-colors' }, e('i', { className: 'fa-brands fa-twitter' })),
+                            e('a', { href: '#', className: 'w-10 h-10 rounded-full bg-dark-bg border border-gray-800 flex items-center justify-center text-gray-400 hover:text-primary-orange hover:border-primary-orange transition-colors' }, e('i', { className: 'fa-brands fa-github' }))
                         )
                     ),
-                    e('div', {},
-                        e('h3', { className: 'text-xl font-bold text-gray-50 mb-6' }, 'Connect With Us'),
-                        e('div', { className: 'flex space-x-6' },
-                            e('a', { href: '#', className: 'text-gray-300 hover:text-primary-orange text-3xl transition-colors' }, e('i', { className: 'fa-brands fa-twitter' })),
-                            e('a', { href: '#', className: 'text-gray-300 hover:text-primary-orange text-3xl transition-colors' }, e('i', { className: 'fa-brands fa-discord' })),
-                            e('a', { href: '#', className: 'text-gray-300 hover:text-primary-orange text-3xl transition-colors' }, e('i', { className: 'fa-brands fa-github' }))
-                        ),
-                        e('p', { className: 'text-gray-500 text-sm mt-6' }, 'Follow us for updates and support.')
+                    e('div', { className: 'md:col-span-3 md:col-start-7' },
+                        e('h3', { className: 'text-lg font-bold text-gray-50 mb-6' }, 'Quick Links'),
+                        e('ul', { className: 'space-y-4' },
+                            e('li', null, e('a', { href: '#hero', className: 'text-gray-400 hover:text-primary-orange transition-colors' }, 'Home')),
+                            e('li', null, e('a', { href: '#features', className: 'text-gray-400 hover:text-primary-orange transition-colors' }, 'Features')),
+                            e('li', null, e('a', { href: '#testimonials', className: 'text-gray-400 hover:text-primary-orange transition-colors' }, 'Testimonials'))
+                        )
+                    ),
+                    e('div', { className: 'md:col-span-3' },
+                        e('h3', { className: 'text-lg font-bold text-gray-50 mb-6' }, 'Get the App'),
+                        e('ul', { className: 'space-y-4' },
+                            e('li', null, e('a', { href: DOWNLOAD_LINK, className: 'text-gray-400 hover:text-primary-orange transition-colors' }, 'Download for Windows')),
+                            e('li', null, e('a', { href: '#', className: 'text-gray-400 hover:text-primary-orange transition-colors' }, 'Documentation')),
+                            e('li', null, e('a', { href: '#', className: 'text-gray-400 hover:text-primary-orange transition-colors' }, 'Support'))
+                        )
                     )
+                ),
+                e('div', { className: 'max-w-7xl mx-auto px-6 pt-8 border-t border-gray-800 text-center flex flex-col md:flex-row justify-between items-center gap-4' },
+                    e('p', { className: 'text-gray-500 text-sm' }, '© 2024 YT Downloader Pro. All rights reserved.'),
+                    e('p', { className: 'text-gray-500 text-sm' }, 'Designed for seamless downloads.')
                 )
             );
         };
